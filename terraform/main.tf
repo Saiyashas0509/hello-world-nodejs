@@ -49,7 +49,7 @@ resource "aws_ecs_task_definition" "hello_world" {
       portMappings = [
         {
           containerPort = 3000
-          hostPort      = 80
+          hostPort      = 3000
         }
       ]
     }
