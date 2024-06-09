@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -57,8 +70,13 @@ resource "aws_ecs_task_definition" "hello_world" {
   ])
 }
 
+resource "random_string" "suffix" {
+  length  = 8
+  special = false
+}
+
 resource "aws_ecs_service" "main" {
-  name            = "hello-world-service"
+  name            = "hello-world-service-${random_string.suffix.result}"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.hello_world.arn
   desired_count   = 1
@@ -70,4 +88,13 @@ resource "aws_ecs_service" "main" {
     security_groups  = [aws_security_group.main.id]
     assign_public_ip = true
   }
+}
+
+resource "aws_security_group_rule" "allow_http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.main.id
 }
