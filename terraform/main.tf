@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "hello_world" {
 }
 
 resource "aws_ecs_service" "main" {
-  name            = "hello-world-service"
+  name            = "hello-world-service-${timestamp()}"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.hello_world.arn
   desired_count   = 1
