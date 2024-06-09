@@ -4,12 +4,12 @@ provider "aws" {
 
 
 data "aws_vpc" "main" {
-  id = "vpc-01d51a031e1582ddb" 
+  id = "vpc-073c56a0e1cc9922c" 
 }
 
 
 data "aws_subnet" "main" {
-  id = "subnet-0512de6eda1d6c2db"  
+  id = "subnet-06a11bfefe8c0fc2b"  
 }
 
 resource "aws_security_group" "main" {
