@@ -2,17 +2,18 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+
+data "aws_vpc" "main" {
+  id = "vpc-01d51a031e1582ddb" 
 }
 
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
+
+data "aws_subnet" "main" {
+  id = "subnet-0512de6eda1d6c2db"  
 }
 
 resource "aws_security_group" "main" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = data.aws_vpc.main.id
 
   ingress {
     from_port   = 80
@@ -43,7 +44,7 @@ resource "aws_ecs_task_definition" "hello_world" {
   container_definitions = jsonencode([
     {
       name      = "hello-world-app"
-      image     = "saiyashas/hello-world-app:latest"
+      image     = "YOUR_DOCKERHUB_USERNAME/hello-world-app:latest"
       essential = true
 
       portMappings = [
@@ -65,7 +66,7 @@ resource "aws_ecs_service" "main" {
   launch_type = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.main.id]
+    subnets          = [data.aws_subnet.main.id]
     security_groups  = [aws_security_group.main.id]
     assign_public_ip = true
   }
