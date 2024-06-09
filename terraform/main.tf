@@ -15,20 +15,20 @@ provider "aws" {
   region = "us-east-1"
 }
 
-
+# Generate a random string for uniqueness
 resource "random_string" "suffix" {
   length  = 8
   special = false
 }
 
-
+# Use an existing VPC
 data "aws_vpc" "main" {
-  id = "vpc-073c56a0e1cc9922c"  
+  id = "vpc-073c56a0e1cc9922c"  # Replace with your existing VPC ID
 }
 
-
+# Use an existing Subnet
 data "aws_subnet" "main" {
-  id = "subnet-06a11bfefe8c0fc2b"  
+  id = "subnet-06a11bfefe8c0fc2b"  # Replace with your existing Subnet ID
 }
 
 resource "aws_security_group" "main" {
@@ -91,7 +91,13 @@ resource "aws_ecs_service" "main" {
   }
 }
 
+# Check if security group rule already exists
+data "aws_security_group" "main" {
+  id = aws_security_group.main.id
+}
+
 resource "aws_security_group_rule" "allow_http" {
+  count             = length(data.aws_security_group.main.ingress) == 0 ? 1 : 0
   type              = "ingress"
   from_port         = 80
   to_port           = 80
