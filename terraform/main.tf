@@ -47,6 +47,10 @@ resource "aws_security_group" "main" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  lifecycle {
+    ignore_changes = [ingress]
+  }
 }
 
 resource "aws_ecs_cluster" "main" {
@@ -91,13 +95,7 @@ resource "aws_ecs_service" "main" {
   }
 }
 
-# Check if security group rule already exists
-data "aws_security_group" "main" {
-  id = aws_security_group.main.id
-}
-
 resource "aws_security_group_rule" "allow_http" {
-  count             = length(data.aws_security_group.main.ingress) == 0 ? 1 : 0
   type              = "ingress"
   from_port         = 80
   to_port           = 80
