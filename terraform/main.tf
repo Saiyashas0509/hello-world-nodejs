@@ -16,6 +16,12 @@ provider "aws" {
 }
 
 
+resource "random_string" "suffix" {
+  length  = 8
+  special = false
+}
+
+
 data "aws_vpc" "main" {
   id = "vpc-073c56a0e1cc9922c"  
 }
@@ -44,7 +50,7 @@ resource "aws_security_group" "main" {
 }
 
 resource "aws_ecs_cluster" "main" {
-  name = "hello-world-cluster"
+  name = "hello-world-cluster-${random_string.suffix.result}"
 }
 
 resource "aws_ecs_task_definition" "hello_world" {
@@ -70,11 +76,6 @@ resource "aws_ecs_task_definition" "hello_world" {
   ])
 }
 
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-}
-
 resource "aws_ecs_service" "main" {
   name            = "hello-world-service-${random_string.suffix.result}"
   cluster         = aws_ecs_cluster.main.id
@@ -97,4 +98,8 @@ resource "aws_security_group_rule" "allow_http" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.main.id
+
+  lifecycle {
+    ignore_changes = [security_group_id]
+  }
 }
