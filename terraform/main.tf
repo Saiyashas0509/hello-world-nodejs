@@ -1,3 +1,4 @@
+# Define required providers
 terraform {
   required_providers {
     aws = {
@@ -92,18 +93,5 @@ resource "aws_ecs_service" "main" {
     subnets          = [data.aws_subnet.main.id]
     security_groups  = [aws_security_group.main.id]
     assign_public_ip = true
-  }
-}
-
-resource "aws_security_group_rule" "allow_http" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.main.id
-
-  lifecycle {
-    ignore_changes = [security_group_id]
   }
 }
